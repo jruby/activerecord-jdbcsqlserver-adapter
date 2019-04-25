@@ -15,7 +15,7 @@ module Arel
 
       def visit_Arel_Nodes_BindParam o, collector
         collector.add_bind(o) { |i| "@#{i-1}" }
-      end
+      end unless defined? JRUBY_VERSION # converts bind argument markers "?" to "@n", but JDBC wants "?"
 
       def visit_Arel_Nodes_Bin o, collector
         visit o.expr, collector

@@ -14,6 +14,22 @@ module ActiveRecord
             Data.new date, self
           end
 
+          if defined? JRUBY_VERSION
+
+            # Currently only called by our custom DateTime type for formatting
+            def _formatted(value)
+              value.to_s(:_sqlserver_dateformat)
+            end
+
+            # @Override
+            # We do not want the DateTime object to be turned into a string
+            def serialize(value)
+              value = super
+              value.present? ? CoreExt::DateTime._jd_with_sql_type(value, self) : value
+            end
+
+          end
+
           def deserialize(value)
             value.is_a?(Data) ? super(value.value) : super
           end

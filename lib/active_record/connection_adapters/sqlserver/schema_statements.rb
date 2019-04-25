@@ -51,7 +51,7 @@ module ActiveRecord
         end
 
         def indexes(table_name, name = nil)
-          data = select("EXEC sp_helpindex #{quote(table_name)}", name) rescue []
+          data = (select("EXEC sp_helpindex #{quote(table_name)}", name) || []) rescue [] # JDBC returns nil instead of an array or erring out for no results
           data.reduce([]) do |indexes, index|
             index = index.with_indifferent_access
             if index[:index_description] =~ /primary key/
@@ -292,6 +292,9 @@ module ActiveRecord
           select_values sql, 'SCHEMA'
         end
 
+        COLUMN_DEFINITION_BIND_STRING_0 = defined?(JRUBY_VERSION) ? '?' : '@0'
+        COLUMN_DEFINITION_BIND_STRING_1 = defined?(JRUBY_VERSION) ? '?' : '@1'
+
         def column_definitions(table_name)
           identifier = if database_prefix_remote_server?
             SQLServer::Utils.extract_identifiers("#{database_prefix}#{table_name}")
@@ -346,8 +349,8 @@ module ActiveRecord
             INNER JOIN #{database}.sys.columns AS c
               ON o.object_id = c.object_id
               AND c.name = columns.COLUMN_NAME
-            WHERE columns.TABLE_NAME = #{prepared_statements ? '@0' : quote(identifier.object)}
-              AND columns.TABLE_SCHEMA = #{identifier.schema.blank? ? 'schema_name()' : (prepared_statements ? '@1' : quote(identifier.schema))}
+            WHERE columns.TABLE_NAME = #{prepared_statements ? COLUMN_DEFINITION_BIND_STRING_0 : quote(identifier.object)}
+              AND columns.TABLE_SCHEMA = #{identifier.schema.blank? ? 'schema_name()' : (prepared_statements ? COLUMN_DEFINITION_BIND_STRING_1 : quote(identifier.schema))}
             ORDER BY columns.ordinal_position
           }.gsub(/[ \t\r\n]+/, ' ').strip
 

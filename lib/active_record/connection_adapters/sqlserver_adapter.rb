@@ -3,7 +3,7 @@ require 'active_record'
 require 'arel_sqlserver'
 require 'active_record/connection_adapters/abstract_adapter'
 require 'active_record/connection_adapters/sqlserver/core_ext/active_record'
-require 'active_record/connection_adapters/sqlserver/core_ext/explain'
+require 'active_record/connection_adapters/sqlserver/core_ext/explain' unless defined? JRUBY_VERSION
 require 'active_record/connection_adapters/sqlserver/core_ext/explain_subscriber'
 require 'active_record/connection_adapters/sqlserver/core_ext/attribute_methods'
 require 'active_record/connection_adapters/sqlserver/version'
@@ -37,6 +37,18 @@ module ActiveRecord
               SQLServer::SchemaStatements,
               SQLServer::DatabaseLimits,
               SQLServer::DatabaseTasks
+
+      USING_JDBC_DRIVER = defined? JRUBY_VERSION
+
+      if USING_JDBC_DRIVER
+        include ArJdbc::Abstract::ConnectionManagement
+        include ArJdbc::Util::QuotedCache
+        prepend ArJdbc::Abstract::Core
+        prepend ArJdbc::Abstract::DatabaseStatements
+        prepend ArJdbc::Abstract::StatementCache
+        prepend ArJdbc::Abstract::TransactionSupport
+        prepend SQLServer::JDBCOverrides
+      end
 
       ADAPTER_NAME = 'SQLServer'.freeze
 
@@ -161,11 +173,11 @@ module ActiveRecord
         true
       rescue *connection_errors
         false
-      end
+      end unless USING_JDBC_DRIVER # Core takes care of this
 
       def reconnect!
         super
-        disconnect!
+        disconnect! unless USING_JDBC_DRIVER # Don't need to disconnect in JDBC
         connect
       end
 

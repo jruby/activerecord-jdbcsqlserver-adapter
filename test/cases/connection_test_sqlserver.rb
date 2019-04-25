@@ -62,10 +62,10 @@ class ConnectionTestSQLServer < ActiveRecord::TestCase
   private
 
   def disconnect_raw_connection!
-    case connection_options[:mode]
-    when :dblib
-      connection.raw_connection.close rescue nil
-    end
+    #case connection_options[:mode]
+    #when :dblib
+      connection.raw_connection.close #rescue nil
+    #end
   end
 
 end

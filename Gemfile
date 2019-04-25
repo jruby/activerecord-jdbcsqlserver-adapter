@@ -1,8 +1,8 @@
 require 'openssl'
 source 'https://rubygems.org'
 gemspec
-
-gem 'sqlite3'
+gem 'rb-readline', platform: :mri
+gem 'sqlite3', platform: :mri
 gem 'minitest', '< 5.3.4'
 gem 'bcrypt'
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
@@ -18,7 +18,7 @@ else
   version = ENV['RAILS_VERSION'] || begin
     require 'net/http'
     require 'yaml'
-    spec = eval(File.read('activerecord-sqlserver-adapter.gemspec'))
+    spec = eval(File.read('activerecord-jdbcsqlserver-adapter.gemspec'))
     ver = spec.dependencies.detect{ |d|d.name == 'activerecord' }.requirement.requirements.first.last.version
     major, minor, tiny, pre = ver.split('.')
     if !pre
@@ -43,16 +43,16 @@ end
 
 group :tinytds do
   if ENV['TINYTDS_SOURCE']
-    gem 'tiny_tds', path: ENV['TINYTDS_SOURCE']
+    gem 'tiny_tds', path: ENV['TINYTDS_SOURCE'], platform: :mri
   elsif ENV['TINYTDS_VERSION']
-    gem 'tiny_tds', ENV['TINYTDS_VERSION']
+    gem 'tiny_tds', ENV['TINYTDS_VERSION'], platform: :mri
   else
-    gem 'tiny_tds'
+    gem 'tiny_tds', platform: :mri
   end
 end
 
 group :development do
-  gem 'byebug'
+  gem 'byebug', platform: :mri
   gem 'mocha'
   gem 'minitest-spec-rails'
 end

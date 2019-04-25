@@ -16,6 +16,22 @@ module ActiveRecord
             Data.new time, self
           end
 
+          if defined? JRUBY_VERSION
+
+            # Currently only called from our custom Time type for formatting
+            def _formatted(value)
+              "#{value.to_s(:_sqlserver_time)}.#{quote_fractional(value)}"
+            end
+
+            # @Override
+            # We do not want the Time object to be turned into a string
+            def serialize(value)
+              value = super
+              value.acts_like?(:time) ? CoreExt::Time._at_with_sql_type(value, self) : value
+            end
+
+          end
+
           def deserialize(value)
             value.is_a?(Data) ? super(value.value) : super
           end
