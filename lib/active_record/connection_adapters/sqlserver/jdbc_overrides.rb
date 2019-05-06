@@ -147,6 +147,13 @@ module ActiveRecord
           end
         end
 
+        private
+
+        def _quote(value)
+          return value.quoted if value.is_a?(SQLServer::CoreExt::Time) || value.is_a?(SQLServer::CoreExt::DateTime)
+          super
+        end
+
       end
     end
   end
