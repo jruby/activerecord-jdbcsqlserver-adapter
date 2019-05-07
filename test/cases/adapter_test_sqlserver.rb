@@ -123,6 +123,7 @@ class AdapterTestSQLServer < ActiveRecord::TestCase
     end
 
     it 'lowercase schema reflection when set' do
+      skip 'we do not currently support forcing identifier case' if defined? JRUBY_VERSION
       connection.lowercase_schema_reflection = true
       assert SSTestUppered.columns_hash['column1']
       assert_equal 'Got a minute?', SSTestUppered.first.column1

@@ -49,7 +49,19 @@ module ActiveRecord
         # SQLServer gem handles this by overridding exec_explain but that doesn't correctly unprepare them for our needs
         def explain(arel, binds = [])
           arel = ActiveRecord::Base.send(:replace_bind_variables, arel, binds.map(&:value_for_database))
-          super(arel, [])
+          sql = to_sql(arel)
+          result = with_showplan_on { execute(sql, 'EXPLAIN') }
+          if result.is_a?(Array)
+            # We got back multiple result sets but the printer expects them to all be in one
+            main_result = result[0]
+            result.each_with_index do |result_obj, i|
+              next if i == 0
+              main_result.rows.concat(result_obj.rows)
+            end
+            result = main_result
+          end
+          printer = showplan_printer.new(result)
+          printer.pp
         end
 
         # @see ActiveRecord::ConnectionAdapters::JdbcAdapter#jdbc_connection_class

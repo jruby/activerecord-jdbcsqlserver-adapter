@@ -725,7 +725,7 @@ class TransactionTest < ActiveRecord::TestCase
       Topic.connection.release_savepoint("another")
     end
   end
-end
+end unless defined? JRUBY_VERSION # The rails version of this test passes
 
 
 
