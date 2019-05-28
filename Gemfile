@@ -17,11 +17,11 @@ arjdbc_repo = 'https://github.com/jruby/activerecord-jdbc-adapter.git'
 if ENV['ARJDBC_SOURCE']
   gemspec path: ENV['ARJDBC_SOURCE']
 elsif ENV['ARJDBC_BRANCH']
-  gem 'activerecord-jdbc-adapter', git: arjdbc_repo, branch: ['ARJDBC_BRANCH']
+  gem 'activerecord-jdbc-adapter', git: arjdbc_repo, branch: ENV['ARJDBC_BRANCH']
 elsif ENV['ARJDBC_TAG']
-  gem 'activerecord-jdbc-adapter', git: arjdbc_repo, tag: ['ARJDBC_TAG']
+  gem 'activerecord-jdbc-adapter', git: arjdbc_repo, tag: ENV['ARJDBC_TAG']
 elsif ENV['ARJDBC_COMMIT']
-  gem 'activerecord-jdbc-adapter', git: arjdbc_repo, ref: ['ARJDBC_COMMIT']
+  gem 'activerecord-jdbc-adapter', git: arjdbc_repo, ref: ENV['ARJDBC_COMMIT']
 end
 
 if ENV['RAILS_SOURCE']
@@ -47,7 +47,7 @@ else
       ver
     end
   end
-  gem 'rails', git: "git://github.com/rails/rails.git", tag: "v#{version}"
+  gem 'rails', git: "https://github.com/rails/rails.git", tag: "v#{version}"
 end
 
 if ENV['AREL']
