@@ -17,3 +17,6 @@ container=$(docker ps -q --filter ancestor=metaskills/mssql-server-linux-rails:$
 if [[ -z $container ]]; then
   docker start $container && sleep 10
 fi
+
+docker exec -it $container /opt/mssql-tools/bin/sqlcmd -U sa -P super01S3cUr3 -S localhost -Q "SELECT name FROM master.dbo.sysdatabases"
+docker exec -it $container /opt/mssql-tools/bin/sqlcmd -U sa -P super01S3cUr3 -S localhost -Q "SELECT loginname, dbname FROM syslogins"
