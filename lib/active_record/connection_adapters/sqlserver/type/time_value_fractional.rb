@@ -55,8 +55,10 @@ module ActiveRecord
           private
 
           def seconds_precision(value)
-            seconds = super
-            seconds > fractional_max ? fractional_scale_max : seconds
+            return 0 if fractional_scale == 0
+            return value.nsec if fractional_scale >= fractional_digits
+            decimal_places = 10 ** (fractional_digits - fractional_scale)
+            value.nsec / decimal_places * decimal_places
           end
 
           def fractional_property

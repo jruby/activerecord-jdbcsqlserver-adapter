@@ -1,3 +1,5 @@
+require 'date'
+
 module ActiveRecord
   module ConnectionAdapters
     module SQLServer

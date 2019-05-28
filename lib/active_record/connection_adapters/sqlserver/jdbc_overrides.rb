@@ -25,8 +25,8 @@ module ActiveRecord
           end
         end
 
-        # FIXME Make this use the jdbc method of calling stored procedures
-        def execute_procedure(proc_name, *variables)
+        # TODO Move to java for potential perf boost
+        def execute_procedure(proc_name, *variables, &block)
           vars = if variables.any? && variables.first.is_a?(Hash)
                    variables.first.map { |k, v| "@#{k} = #{quote(v)}" }
                  else
@@ -34,12 +34,18 @@ module ActiveRecord
                  end.join(', ')
           sql = "EXEC #{proc_name} #{vars}".strip
           log(sql, 'Execute Procedure') do
-            result = @connection.execute_query_raw(sql) # This call needed to be made differently
-            result.map! do |row|
-              row = row.is_a?(Hash) ? row.with_indifferent_access : row
-              yield(row) if block_given?
-              row
+            result = @connection.execute(sql)
+
+            return [] unless result
+
+            if result.is_a?(Array)
+              result.map! do |res|
+                process_execute_procedure_result(res, &block)
+              end
+            else
+              result = process_execute_procedure_result(result, &block)
             end
+
             result
           end
         end
@@ -164,6 +170,14 @@ module ActiveRecord
         def _quote(value)
           return value.quoted if value.is_a?(SQLServer::CoreExt::Time) || value.is_a?(SQLServer::CoreExt::DateTime)
           super
+        end
+
+        def process_execute_procedure_result(result)
+          result.map do |row|
+            obj = row.with_indifferent_access
+            yield(obj) if block_given?
+            obj
+          end
         end
 
       end

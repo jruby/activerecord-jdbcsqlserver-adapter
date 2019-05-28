@@ -367,13 +367,13 @@ class ColumnTestSQLServer < ActiveRecord::TestCase
       obj.must_equal obj.class.where(datetime2_7: time).first
       # Can save 100 nanosecond precisoins and return again.
       time  = Time.utc 9999, 12, 31, 23, 59, 59, Rational(123456755, 1000)
-      time2 = Time.utc 9999, 12, 31, 23, 59, 59, Rational(123456800, 1000)
+      time2 = Time.utc 9999, 12, 31, 23, 59, 59, Rational(123456700, 1000) # This test is actually wrong because rails specifies that it should truncate and this test tests that it rounds
       obj.datetime2_7 = time
-      obj.datetime2_7.must_equal           time2, "Nanoseconds were <#{obj.datetime2_7.nsec}> vs <123456800>"
+      obj.datetime2_7.must_equal           time2, "Nanoseconds were <#{obj.datetime2_7.nsec}> vs <123456700>"
       obj.save!
-      obj.datetime2_7.must_equal           time2, "Nanoseconds were <#{obj.datetime2_7.nsec}> vs <123456800>"
+      obj.datetime2_7.must_equal           time2, "Nanoseconds were <#{obj.datetime2_7.nsec}> vs <123456700>"
       obj.reload
-      obj.datetime2_7.must_equal           time2, "Nanoseconds were <#{obj.datetime2_7.nsec}> vs <123456800>"
+      obj.datetime2_7.must_equal           time2, "Nanoseconds were <#{obj.datetime2_7.nsec}> vs <123456700>"
       obj.must_equal obj.class.where(datetime2_7: time).first
       obj.must_equal obj.class.where(datetime2_7: time2).first
       # Can save small fraction nanosecond precisoins and return again.
@@ -429,13 +429,13 @@ class ColumnTestSQLServer < ActiveRecord::TestCase
       type.scale.must_be_nil
       # Can save 100 nanosecond precisoins and return again.
       obj.datetimeoffset_7 = Time.new(2010, 04, 01, 12, 34, 56, +18000).change(nsec: 123456755)
-      obj.datetimeoffset_7.must_equal   Time.new(2010, 04, 01, 12, 34, 56, +18000).change(nsec: 123456800), "Nanoseconds were <#{obj.datetimeoffset_7.nsec}> vs <123456800>"
+      obj.datetimeoffset_7.must_equal   Time.new(2010, 04, 01, 12, 34, 56, +18000).change(nsec: 123456700), "Nanoseconds were <#{obj.datetimeoffset_7.nsec}> vs <123456700>" # Was rounding instead of truncating
       obj.save!
-      obj.datetimeoffset_7.must_equal   Time.new(2010, 04, 01, 12, 34, 56, +18000).change(nsec: 123456800), "Nanoseconds were <#{obj.datetimeoffset_7.nsec}> vs <123456800>"
+      obj.datetimeoffset_7.must_equal   Time.new(2010, 04, 01, 12, 34, 56, +18000).change(nsec: 123456700), "Nanoseconds were <#{obj.datetimeoffset_7.nsec}> vs <123456700>"
       obj.reload
-      obj.datetimeoffset_7.must_equal   Time.new(2010, 04, 01, 12, 34, 56, +18000).change(nsec: 123456800), "Nanoseconds were <#{obj.datetimeoffset_7.nsec}> vs <123456800>"
+      obj.datetimeoffset_7.must_equal   Time.new(2010, 04, 01, 12, 34, 56, +18000).change(nsec: 123456700), "Nanoseconds were <#{obj.datetimeoffset_7.nsec}> vs <123456700>"
       # Maintains the timezone
-      time = ActiveSupport::TimeZone['America/Los_Angeles'].local 2010, 12, 31, 23, 59, 59, Rational(123456800, 1000)
+      time = ActiveSupport::TimeZone['America/Los_Angeles'].local 2010, 12, 31, 23, 59, 59, Rational(123456700, 1000)
       obj.datetimeoffset_7 = time
       obj.datetimeoffset_7.must_equal time
       obj.save!
