@@ -4,30 +4,23 @@ services:
   - docker
 env:
   global:
-    - ACTIVERECORD_UNITTEST_HOST=localhost
-    - ACTIVERECORD_UNITTEST_DATASERVER=localhost
+    - COMPOSE_FILE=docker-compose.ci.yml
     - ARJDBC_BRANCH=mssql-support
-rvm:
-  - jruby-9.1.17.0
-  - jruby-9.2.7.0
-before_install:
-  - export PATH=/opt/local/bin:$PATH
-  - docker info
-  - sudo ./test/bin/setup.sh
-#  - sudo ./test/bin/install-openssl.sh
-#  - openssl version
-#  - sudo ./test/bin/install-freetds.sh
-#  - tsql -C
-install:
-  - export PATH=/opt/local/bin:$PATH
-  - gem install bundler
-  - bundle --version
-  - bundle install
-script:
-  - bundle exec rake
+  matrix:
+    - TARGET_VERSION=9.1
+    - TARGET_VERSION=9.2
 branches:
   only:
-  - /.*-stable-jdbc$/
+    - /.*-stable-jdbc$/
+before_install:
+  - sudo rm /usr/local/bin/docker-compose
+  - sudo curl -L "https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  - sudo chmod +x /usr/local/bin/docker-compose
+install:
+  - docker-compose build --build-arg TARGET_VERSION=$TARGET_VERSION-jdk-alpine --build-arg TARGET_ARJDBC_BRANCH=$ARJDBC_BRANCH
+script:
+  - docker-compose run ci
 matrix:
   allow_failures:
-  - rmv: jruby-9.1.17.0
+    - env: TARGET_VERSION=9.1
+
