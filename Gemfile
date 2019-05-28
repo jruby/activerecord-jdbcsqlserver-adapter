@@ -1,6 +1,7 @@
 require 'openssl'
 source 'https://rubygems.org'
 gemspec
+
 gem 'rb-readline', platform: :mri
 gem 'sqlite3', platform: :mri
 gem 'minitest', '< 5.3.4'
@@ -9,6 +10,18 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 if RbConfig::CONFIG["host_os"] =~ /darwin/
   gem 'terminal-notifier-guard'
+end
+
+arjdbc_repo = 'https://github.com/jruby/activerecord-jdbc-adapter.git'
+
+if ENV['ARJDBC_SOURCE']
+  gemspec path: ENV['ARJDBC_SOURCE']
+elsif ENV['ARJDBC_BRANCH']
+  gem 'activerecord-jdbc-adapter', git: arjdbc_repo, branch: ['ARJDBC_BRANCH']
+elsif ENV['ARJDBC_TAG']
+  gem 'activerecord-jdbc-adapter', git: arjdbc_repo, tag: ['ARJDBC_TAG']
+elsif ENV['ARJDBC_COMMIT']
+  gem 'activerecord-jdbc-adapter', git: arjdbc_repo, ref: ['ARJDBC_COMMIT']
 end
 
 if ENV['RAILS_SOURCE']
