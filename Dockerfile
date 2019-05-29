@@ -10,7 +10,7 @@ WORKDIR $WORKDIR
 
 COPY . $WORKDIR
 
-RUN apk add --no-cache git
+RUN apk add --no-cache git freetds
 
 ARG TARGET_ARJDBC_BRANCH=5-0-stable
 ENV ARJDBC_BRANCH $TARGET_ARJDBC_BRANCH
