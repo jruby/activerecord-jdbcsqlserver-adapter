@@ -109,6 +109,12 @@ module ActiveRecord
 
         protected
 
+        # Called to set any connection specific settings that aren't defined ahead of time
+        def configure_connection
+          # For sql server 2008+ we want it to send an actual time otherwise comparisons with time columns don't work
+          @connection.connection.setSendTimeAsDatetime(false)
+        end
+
         # @Overwrite
         # Makes a connection before configuring it
         # @connection actually gets defined and then the connect method in the sqlserver gem overrides it

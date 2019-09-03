@@ -12,10 +12,11 @@ if RbConfig::CONFIG["host_os"] =~ /darwin/
   gem 'terminal-notifier-guard'
 end
 
+
 arjdbc_repo = 'https://github.com/jruby/activerecord-jdbc-adapter.git'
 
 if ENV['ARJDBC_SOURCE']
-  gemspec path: ENV['ARJDBC_SOURCE']
+  gem 'activerecord-jdbc-adapter', path: ENV['ARJDBC_SOURCE']
 elsif ENV['ARJDBC_BRANCH']
   gem 'activerecord-jdbc-adapter', git: arjdbc_repo, branch: ENV['ARJDBC_BRANCH']
 elsif ENV['ARJDBC_TAG']
