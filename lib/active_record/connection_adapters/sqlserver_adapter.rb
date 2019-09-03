@@ -187,7 +187,7 @@ module ActiveRecord
         when :dblib
           @connection.close rescue nil
         end
-        @connection = nil
+        @connection = nil unless USING_JDBC_DRIVER
         @spid = nil
         @collation = nil
       end
