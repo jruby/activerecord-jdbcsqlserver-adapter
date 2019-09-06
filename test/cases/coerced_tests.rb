@@ -150,7 +150,7 @@ class CalculationsTest < ActiveRecord::TestCase
     queries = capture_sql_ss { Account.limit(1).offset(1).count }
     assert_equal 1, queries.length
     queries.first.must_match %r{ORDER BY \[accounts\]\.\[id\] ASC OFFSET \? ROWS FETCH NEXT \? ROWS ONLY}
-  end unless defined? JRUBY_VERSION
+  end if defined? JRUBY_VERSION
 
   # Leave it up to users to format selects/functions so HAVING works correctly.
   coerce_tests! :test_having_with_strong_parameters
@@ -840,6 +840,6 @@ end
 module ActiveRecord
   class StatementCacheTest < ActiveRecord::TestCase
     # Getting random failures.
-    coerce_tests! :test_find_does_not_use_statement_cache_if_table_name_is_changed
+    #coerce_tests! :test_find_does_not_use_statement_cache_if_table_name_is_changed
   end
 end
