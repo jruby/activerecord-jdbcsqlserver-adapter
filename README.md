@@ -5,6 +5,8 @@
 
 The JDBC SQL Server adapter for ActiveRecord v5.0 using SQL Server 2012 or higher.
 
+We currently support JRuby 9.2+. Older versions may work but they are not tested and there is a known date issue with JRuby 9.1.
+
 For older versions see [activerecord-jdbcmssql-adapter](https://rubygems.org/gems/activerecord-jdbcmssql-adapter)
 
 
