@@ -1,3 +1,7 @@
+## v50.0.0
+
+* Forked original gem to provide JRuby support
+
 ## v5.0.8
 
 * Memorized SQL Server Version to prevent a flood of SELECT @@version queries. Fixes #632
