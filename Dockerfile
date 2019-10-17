@@ -12,7 +12,7 @@ COPY . $WORKDIR
 
 RUN apk add --no-cache git freetds
 
-ARG TARGET_ARJDBC_BRANCH=5-0-stable
+ARG TARGET_ARJDBC_BRANCH=50-stable
 ENV ARJDBC_BRANCH $TARGET_ARJDBC_BRANCH
 
 RUN bundle install --jobs `expr $(cat /proc/cpuinfo | grep -c "cpu cores") - 1` --retry 3
