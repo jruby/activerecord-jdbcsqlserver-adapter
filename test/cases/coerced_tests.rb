@@ -36,6 +36,7 @@ module ActiveRecord
 
     # As far as I can tell, SQL Server does not support null bytes in strings.
     coerce_tests! :test_update_prepared_statement
+    coerce_tests! :test_log_invalid_encoding if defined? JRUBY_VERSION # JRuby just happily converts the encoding
 
     # So sp_executesql swallows this exception. Run without prpared to see it.
     coerce_tests! :test_value_limit_violations_are_translated_to_specific_exception
@@ -164,14 +165,26 @@ class CalculationsTest < ActiveRecord::TestCase
     queries = capture_sql_ss { Account.limit(1).count }
     assert_equal 1, queries.length
     queries.first.must_match %r{ORDER BY \[accounts\]\.\[id\] ASC OFFSET 0 ROWS FETCH NEXT @0 ROWS ONLY.*@0 = 1}
-  end
+  end unless defined? JRUBY_VERSION
+
+  def test_limit_is_kept_coerced
+    queries = capture_sql_ss { Account.limit(1).count }
+    assert_equal 1, queries.length
+    queries.first.must_match %r{ORDER BY \[accounts\]\.\[id\] ASC OFFSET 0 ROWS FETCH NEXT \? ROWS ONLY}
+  end if defined? JRUBY_VERSION
 
   coerce_tests! :test_limit_with_offset_is_kept
   def test_limit_with_offset_is_kept_coerced
     queries = capture_sql_ss { Account.limit(1).offset(1).count }
     assert_equal 1, queries.length
     queries.first.must_match %r{ORDER BY \[accounts\]\.\[id\] ASC OFFSET @0 ROWS FETCH NEXT @1 ROWS ONLY.*@0 = 1, @1 = 1}
-  end
+  end unless defined? JRUBY_VERSION
+
+  def test_limit_with_offset_is_kept_coerced
+    queries = capture_sql_ss { Account.limit(1).offset(1).count }
+    assert_equal 1, queries.length
+    queries.first.must_match %r{ORDER BY \[accounts\]\.\[id\] ASC OFFSET \? ROWS FETCH NEXT \? ROWS ONLY}
+  end if defined? JRUBY_VERSION
 
   # Leave it up to users to format selects/functions so HAVING works correctly.
   coerce_tests! :test_having_with_strong_parameters
@@ -434,14 +447,28 @@ class FinderTest < ActiveRecord::TestCase
     assert_sql(/SELECT\s+1 AS one FROM \[topics\].*OFFSET 0 ROWS FETCH NEXT @0 ROWS ONLY.*@0 = 1/i) do
       Topic.exists?
     end
-  end
+  end unless defined? JRUBY_VERSION
+
+  def test_exists_does_not_select_columns_without_alias_coerced
+    # Unfortunately the best we can do is check for ? with prepared statements on
+    assert_sql(/SELECT\s+1 AS one FROM \[topics\].*OFFSET 0 ROWS FETCH NEXT \? ROWS ONLY/i) do
+      Topic.exists?
+    end
+  end if defined? JRUBY_VERSION
 
   coerce_tests! :test_take_and_first_and_last_with_integer_should_use_sql_limit
   def test_take_and_first_and_last_with_integer_should_use_sql_limit_coerced
     assert_sql(/OFFSET 0 ROWS FETCH NEXT @0 ROWS ONLY.* @0 = 3/) { Topic.take(3).entries }
     assert_sql(/OFFSET 0 ROWS FETCH NEXT @0 ROWS ONLY.* @0 = 2/) { Topic.first(2).entries }
     assert_sql(/OFFSET 0 ROWS FETCH NEXT @0 ROWS ONLY.* @0 = 5/) { Topic.last(5).entries }
-  end
+  end unless defined? JRUBY_VERSION
+
+  def test_take_and_first_and_last_with_integer_should_use_sql_limit_coerced
+    # Unfortunately the best we can do is check for ? with prepared statements on
+    assert_sql(/OFFSET 0 ROWS FETCH NEXT \? ROWS ONLY/) { Topic.take(3).entries }
+    assert_sql(/OFFSET 0 ROWS FETCH NEXT \? ROWS ONLY/) { Topic.first(2).entries }
+    assert_sql(/OFFSET 0 ROWS FETCH NEXT \? ROWS ONLY/) { Topic.last(5).entries }
+  end if defined? JRUBY_VERSION
 
   # This fails only when run in the full test suite task. Just taking it out of the mix.
   coerce_tests! :test_find_with_order_on_included_associations_with_construct_finder_sql_for_association_limiting_and_is_distinct
@@ -779,7 +806,7 @@ class TransactionTest < ActiveRecord::TestCase
       Topic.connection.release_savepoint("another")
     end
   end
-end
+end unless defined? JRUBY_VERSION # The rails version of this test passes
 
 
 
@@ -894,7 +921,7 @@ end
 module ActiveRecord
   class StatementCacheTest < ActiveRecord::TestCase
     # Getting random failures.
-    coerce_tests! :test_find_does_not_use_statement_cache_if_table_name_is_changed
+    #coerce_tests! :test_find_does_not_use_statement_cache_if_table_name_is_changed
   end
 end
 

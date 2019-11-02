@@ -47,7 +47,7 @@ class ConnectionTestSQLServer < ActiveRecord::TestCase
     it 'reset the connection' do
       connection.disconnect!
       connection.raw_connection.must_be_nil
-    end
+    end unless defined? JRUBY_VERSION
 
     it 'be able to disconnect and reconnect at will' do
       disconnect_raw_connection!
@@ -62,10 +62,10 @@ class ConnectionTestSQLServer < ActiveRecord::TestCase
   private
 
   def disconnect_raw_connection!
-    case connection_options[:mode]
-    when :dblib
-      connection.raw_connection.close rescue nil
-    end
+    #case connection_options[:mode]
+    #when :dblib
+      connection.raw_connection.close #rescue nil
+    #end
   end
 
 end

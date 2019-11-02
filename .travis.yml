@@ -5,21 +5,22 @@ services:
 env:
   global:
     - COMPOSE_FILE: docker-compose.ci.yml
+    #- ARJDBC_BRANCH=mssql-support
+  matrix:
+    - TARGET_VERSION=9.1
+    - TARGET_VERSION=9.2
+branches:
+  only:
+    - /.*-stable-jdbc$/
 before_install:
   - sudo rm /usr/local/bin/docker-compose
   - sudo curl -L "https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
   - sudo chmod +x /usr/local/bin/docker-compose
 install:
-  - docker-compose build --build-arg TARGET_VERSION=$TARGET_VERSION
+  - docker-compose build --build-arg TARGET_VERSION=$TARGET_VERSION-jdk-alpine
+  #- docker-compose build --build-arg TARGET_VERSION=$TARGET_VERSION-jdk-alpine --build-arg TARGET_ARJDBC_BRANCH=$ARJDBC_BRANCH
 script:
   - docker-compose run ci
 matrix:
-  include:
-    - name: 2.3.8
-      env: TARGET_VERSION=2.3.8
-    - name: 2.4.6
-      env: TARGET_VERSION=2.4.6
-    - name: 2.5.5
-      env: TARGET_VERSION=2.5.5
-    - name: 2.6.3
-      env: TARGET_VERSION=2.6.3
+  allow_failures:
+    - env: TARGET_VERSION=9.1

@@ -3,12 +3,16 @@ require 'rake/testtask'
 require_relative 'test/support/paths_sqlserver'
 require_relative 'test/support/rake_helpers'
 
-task test: ['test:dblib']
+if defined? JRUBY_VERSION
+  task test: ['test:jdbc']
+else
+  task test: ['test:dblib']
+end
 task default: [:test]
 
 namespace :test do
 
-  %w(dblib).each do |mode|
+  %w(dblib jdbc).each do |mode|
 
     Rake::TestTask.new(mode) do |t|
       t.libs = ARTest::SQLServer.test_load_paths
@@ -17,15 +21,14 @@ namespace :test do
       t.verbose = false
     end
 
-  end
+    task "#{mode}:env" do
+      ENV['ARCONN'] = mode
+    end
 
-  task 'dblib:env' do
-    ENV['ARCONN'] = 'dblib'
+    task mode => "test:#{mode}:env"
   end
 
 end
-
-task 'test:dblib' => 'test:dblib:env'
 
 namespace :profile do
   ['dblib'].each do |mode|

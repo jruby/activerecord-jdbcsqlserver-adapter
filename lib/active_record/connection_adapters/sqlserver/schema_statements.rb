@@ -33,7 +33,7 @@ module ActiveRecord
         end
 
         def indexes(table_name, name = nil)
-          data = select("EXEC sp_helpindex #{quote(table_name)}", name) rescue []
+          data = (select("EXEC sp_helpindex #{quote(table_name)}", name) || []) rescue [] # JDBC returns nil instead of an array or erring out for no results
           data.reduce([]) do |indexes, index|
             index = index.with_indifferent_access
             if index[:index_description] =~ /primary key/
@@ -316,6 +316,9 @@ module ActiveRecord
           }
         end
 
+        COLUMN_DEFINITION_BIND_STRING_0 = defined?(JRUBY_VERSION) ? '?' : '@0'
+        COLUMN_DEFINITION_BIND_STRING_1 = defined?(JRUBY_VERSION) ? '?' : '@1'
+
         def column_definitions(table_name)
           identifier  = database_prefix_identifier(table_name)
           database    = identifier.fully_qualified_database_quoted
@@ -366,14 +369,18 @@ module ActiveRecord
             INNER JOIN #{database}.sys.columns AS c
               ON o.object_id = c.object_id
               AND c.name = columns.COLUMN_NAME
-            WHERE columns.TABLE_NAME = #{prepared_statements ? '@0' : quote(identifier.object)}
-              AND columns.TABLE_SCHEMA = #{identifier.schema.blank? ? 'schema_name()' : (prepared_statements ? '@1' : quote(identifier.schema))}
+            WHERE columns.TABLE_NAME = #{prepared_statements ? COLUMN_DEFINITION_BIND_STRING_0 : quote(identifier.object)}
+              AND columns.TABLE_SCHEMA = #{identifier.schema.blank? ? 'schema_name()' : (prepared_statements ? COLUMN_DEFINITION_BIND_STRING_1 : quote(identifier.schema))}
             ORDER BY columns.ordinal_position
           }.gsub(/[ \t\r\n]+/, ' ').strip
+
           binds = []
-          nv128 = SQLServer::Type::UnicodeVarchar.new limit: 128
-          binds << Relation::QueryAttribute.new('TABLE_NAME', identifier.object, nv128)
-          binds << Relation::QueryAttribute.new('TABLE_SCHEMA', identifier.schema, nv128) unless identifier.schema.blank?
+          if prepared_statements
+            nv128 = SQLServer::Type::UnicodeVarchar.new limit: 128
+            binds << Relation::QueryAttribute.new('TABLE_NAME', identifier.object, nv128)
+            binds << Relation::QueryAttribute.new('TABLE_SCHEMA', identifier.schema, nv128) unless identifier.schema.blank?
+          end
+
           results = sp_executesql(sql, 'SCHEMA', binds)
           results.map do |ci|
             ci = ci.symbolize_keys
