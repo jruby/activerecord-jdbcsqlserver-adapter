@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'activerecord', '~> 5.0.0', '>= 5.0.6'
-  spec.add_dependency 'activerecord-jdbc-adapter' , '~> 50.5'
+  spec.add_dependency 'activerecord', '~> 5.1.0', '>= 5.1.7'
+  spec.add_dependency 'activerecord-jdbc-adapter' , '~> 51.6'
   spec.add_dependency 'jdbc-mssql', '>= 0.6.0'
 end

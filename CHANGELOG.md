@@ -1,3 +1,7 @@
+## v51.0.0
+
+* Forked original gem to provide JRuby support
+
 ## v5.1.6
 
 #### Added

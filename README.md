@@ -2,7 +2,7 @@
 
 [![Gem Version](http://img.shields.io/gem/v/activerecord-jdbcsqlserver-adapter.svg)](https://rubygems.org/gems/activerecord-jdbcsqlserver-adapter) - Gem Version
 
-The JDBC SQL Server adapter for ActiveRecord v5.0 using SQL Server 2012 or higher.
+The JDBC SQL Server adapter for ActiveRecord v5.1 using SQL Server 2012 or higher.
 
 We currently support JRuby 9.2+. Older versions may work but they are not tested and there is a known date issue with JRuby 9.1.
 
