@@ -90,18 +90,6 @@ module ActiveRecord
           @connection.configure_connection
         end
 
-        # @Overwrite
-        # Had some special logic and skipped using gem's internal query methods
-        def select_rows(sql, name = nil, binds = [])
-
-          # In some cases the limit is converted to a `TOP(1)` but the bind parameter is still in the array
-          if !binds.empty? && sql.include?('TOP(1)')
-            binds = binds.delete_if {|b| b.name == 'LIMIT' }
-          end
-
-          exec_query(sql, name, binds).rows
-        end
-
         # Have to reset this because the default arjdbc functionality is to return false unless a level is passed in
         def supports_transaction_isolation?
           true

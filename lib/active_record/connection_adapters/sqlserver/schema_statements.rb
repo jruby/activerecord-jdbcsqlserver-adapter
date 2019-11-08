@@ -101,15 +101,17 @@ module ActiveRecord
               AND KCU.CONSTRAINT_CATALOG = TC.CONSTRAINT_CATALOG
               AND KCU.CONSTRAINT_SCHEMA = TC.CONSTRAINT_SCHEMA
               AND TC.CONSTRAINT_TYPE = N'PRIMARY KEY'
-            WHERE KCU.TABLE_NAME = #{prepared_statements ? '@0' : quote(identifier.object)}
-            AND KCU.TABLE_SCHEMA = #{identifier.schema.blank? ? 'schema_name()' : (prepared_statements ? '@1' : quote(identifier.schema))}
+            WHERE KCU.TABLE_NAME = #{prepared_statements ? COLUMN_DEFINITION_BIND_STRING_0 : quote(identifier.object)}
+            AND KCU.TABLE_SCHEMA = #{identifier.schema.blank? ? 'schema_name()' : (prepared_statements ? COLUMN_DEFINITION_BIND_STRING_1 : quote(identifier.schema))}
             AND TC.CONSTRAINT_TYPE = N'PRIMARY KEY'
             ORDER BY KCU.ORDINAL_POSITION ASC
           }.gsub(/[[:space:]]/, ' ')
           binds = []
-          nv128 = SQLServer::Type::UnicodeVarchar.new limit: 128
-          binds << Relation::QueryAttribute.new('TABLE_NAME', identifier.object, nv128)
-          binds << Relation::QueryAttribute.new('TABLE_SCHEMA', identifier.schema, nv128) unless identifier.schema.blank?
+          if prepared_statements
+            nv128 = SQLServer::Type::UnicodeVarchar.new limit: 128
+            binds << Relation::QueryAttribute.new('TABLE_NAME', identifier.object, nv128)
+            binds << Relation::QueryAttribute.new('TABLE_SCHEMA', identifier.schema, nv128) unless identifier.schema.blank?
+          end
           sp_executesql(sql, 'SCHEMA', binds).map { |r| r['name'] }
         end
 

@@ -113,6 +113,15 @@ class BasicsTest < ActiveRecord::TestCase
       end
     end
   end
+
+  coerce_tests! %r{column names are quoted when using #from clause and model has ignored columns}
+  def test_column_names_are_quoted_when_using_from_clause_and_model_has_ignored_columns_coerced
+    refute_empty Developer.ignored_columns
+    query = Developer.from("developers").to_sql
+    quoted_id = "#{Developer.quoted_table_name}.#{Developer.quoted_primary_key}"
+
+    assert_match(/SELECT #{Regexp.quote(quoted_id)}.* FROM developers/, query)
+  end
 end
 
 
@@ -714,7 +723,7 @@ class RelationTest < ActiveRecord::TestCase
   # Find any limit via our expression.
   coerce_tests! %r{relations don't load all records in #inspect}
   def test_relations_dont_load_all_records_in_inspect_coerced
-    assert_sql(/NEXT @0 ROWS.*@0 = \d+/) do
+    assert_sql(/NEXT \? ROWS ONLY/) do
       Post.all.inspect
     end
   end

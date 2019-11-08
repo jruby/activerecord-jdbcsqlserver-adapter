@@ -13,10 +13,10 @@ class AdapterTestSQLServer < ActiveRecord::TestCase
   let(:basic_update_sql) { "UPDATE [customers] SET [address_street] = NULL WHERE [id] = 2" }
   let(:basic_select_sql) { "SELECT * FROM [customers] WHERE ([customers].[id] = 1)" }
 
-  it 'has basic and non-senstive information in the adpaters inspect method' do
+  it 'has basic and non-sensitive information in the adapters inspect method' do
     string = connection.inspect
     string.must_match %r{ActiveRecord::ConnectionAdapters::SQLServerAdapter}
-    string.must_match %r{version\: \d.\d}
+    string.must_match %r{version\: \d+\.\d}
     string.must_match %r{mode: (dblib|jdbc)}
     string.must_match %r{azure: (true|false)}
     string.wont_match %r{host}
