@@ -1,3 +1,7 @@
+## v52.0.0
+
+- Forked to support JRuby
+
 ## v5.2.0
 
 - #686 sql_for_insert set table name in case when pk is not nil
@@ -22,4 +26,4 @@
 - #642 Added with (nolock) hint to information_schema.views.
 
 
-Please check [5-1-stable](https://github.com/rails-sqlserver/activerecord-sqlserver-adapter/blob/5-1-stable/CHANGELOG.md) for previous changes.
+Please check [5-1-stable-jdbc](https://github.com/jruby/activerecord-jdbcsqlserver-adapter/blob/5-1-stable-jdbc/CHANGELOG.md) for previous changes.

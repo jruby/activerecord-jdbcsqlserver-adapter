@@ -1,6 +1,9 @@
 # Our core date/time overrides to support prepared statements
 require 'active_record/connection_adapters/sqlserver/core_ext/date_time'
 
+require 'active_support' # Need this for the next line
+require 'active_record/log_subscriber' # Need to make sure this is loaded before we load Core for monkey patching
+
 # Load the jar file for the jdbc driver
 require 'jdbc/mssql'
 

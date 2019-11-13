@@ -1,4 +1,4 @@
-# ActiveRecord SQL Server Adapter. For SQL Server 2012 And Higher.
+# ActiveRecord JDBC SQL Server Adapter. For SQL Server 2012 And Higher.
 
 [![Gem Version](http://img.shields.io/gem/v/activerecord-jdbcsqlserver-adapter.svg)](https://rubygems.org/gems/activerecord-jdbcsqlserver-adapter) - Gem Version
 

@@ -5,7 +5,7 @@ services:
 env:
   global:
     - COMPOSE_FILE: docker-compose.ci.yml
-    - ARJDBC_BRANCH=51-stable
+    - ARJDBC_BRANCH: 52-stable
   matrix:
     - TARGET_VERSION=9.1
     - TARGET_VERSION=9.2

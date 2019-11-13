@@ -140,23 +140,15 @@ module ActiveRecord
           [sql, binds, pk, sequence_name]
         end
 
+        # @Override original version uses driver specific query command
+        def sqlserver_version
+          @sqlserver_version ||= select_value('SELECT @@version').to_s
+        end
+
         # @Override
         def translate_exception(exception, message)
           return ActiveRecord::ValueTooLong.new(message) if exception.message.include?('java.sql.DataTruncation')
           super
-        end
-
-        # @Overwrite
-        # Made it so we don't use the internal calls from the gem
-        def version_year
-          return @version_year if defined?(@version_year)
-          @version_year = begin
-            vstring = select_value('SELECT @@version').to_s
-            return 2016 if vstring =~ /vNext/
-            /SQL Server (\d+)/.match(vstring).to_a.last.to_s.to_i
-          rescue Exception => e
-            2016
-          end
         end
 
         private
