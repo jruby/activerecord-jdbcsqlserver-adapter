@@ -6,8 +6,6 @@ This process is much easier than it has been before!
 
 ## TL;DR
 
-Default testing uses DBLIB with TinyTDS.
-
 * Setup two databases in SQL Server, [activerecord_unittest] and [activerecord_unittest2]
 * Create a [rails] user with an empty password and give it a [db_owner] role to both DBs. Some tests require a server role of [sysadmin] too. More details below with DDL SQL examples.
 * $ bundle install
@@ -47,13 +45,13 @@ GO
 The tests of this adapter depend on the existence of the Rails which are automatically cloned for you with bundler. However you can clone Rails from git://github.com/rails/rails.git and set the `RAILS_SOURCE` environment variable so bundler will use another local path instead.
 
 ```
-$ git clone git://github.com/rails-sqlserver/activerecord-sqlserver-adapter.git
+$ git clone git://github.com/jruby/activerecord-jdbcsqlserver-adapter.git
 ```
 
 Suggest just letting bundler do all the work and assuming there is a git tag for the Rails version, you can set `RAILS_VERSION` before bundling.
 
 ```
-$ export RAILS_VERSION='4.2.0'
+$ export RAILS_VERSION='5.0.6'
 $ bundle install
 ```
 
@@ -67,12 +65,6 @@ $ export ACTIVERECORD_UNITTEST_HOST='my.db.net'   # Defaults to localhost
 $ export ACTIVERECORD_UNITTEST_PORT='1533'        # Defaults to 1433
 ```
 
-If you have FreeTDS installed and/or want to use a named dataserver in your freetds.conf file
-
-```
-$ export ACTIVERECORD_UNITTEST_DATASERVER='mydbname'
-```
-
 These can be passed down to rake too.
 
 ```
@@ -82,7 +74,7 @@ $ bundle exec rake test ACTIVERECORD_UNITTEST_HOST='my.db.net'
 
 ## Bundling
 
-Now with that out of the way you can run "bundle install" to hook everything up. Our tests use bundler to setup the load paths correctly. The default mode is DBLIB using TinyTDS. It is important to use bundle exec so we can wire up the ActiveRecord test libs correctly.
+Now with that out of the way you can run "bundle install" to hook everything up. Our tests use bundler to setup the load paths correctly. It is important to use bundle exec so we can wire up the ActiveRecord test libs correctly.
 
 ```
 $ bundle exec rake test

@@ -19,6 +19,7 @@ class SQLServerTriggerTest < ActiveRecord::TestCase
   end
 
   it 'can insert into a table with output inserted - with a uniqueidentifier value' do
+    skip 'OUTPUT.inserted not supported at this point' if defined? JRUBY_VERSION
     exclude_output_inserted_table_names['sst_table_with_uuid_trigger'] = 'uniqueidentifier'
     assert SSTestTriggerHistory.all.empty?
     obj = SSTestTriggerUuid.create! event_name: 'test uuid trigger'

@@ -88,7 +88,11 @@ class SpecificSchemaTestSQLServer < ActiveRecord::TestCase
   end
 
   it 'use primary key for row table order in pagination sql' do
-    sql = /ORDER BY \[sst_natural_pk_data\]\.\[legacy_id\] ASC OFFSET @0 ROWS FETCH NEXT @1 ROWS ONLY/
+    if defined? JRUBY_VERSION
+      sql = /ORDER BY \[sst_natural_pk_data\]\.\[legacy_id\] ASC OFFSET \? ROWS FETCH NEXT \? ROWS ONLY/
+    else
+      sql = /ORDER BY \[sst_natural_pk_data\]\.\[legacy_id\] ASC OFFSET @0 ROWS FETCH NEXT @1 ROWS ONLY/
+    end
     assert_sql(sql) { SSTestNaturalPkData.limit(5).offset(5).load }
   end
 
@@ -118,7 +122,7 @@ class SpecificSchemaTestSQLServer < ActiveRecord::TestCase
     # Taking care of everything.
     assert_sql(/@0 = 'T'/) { SSTestDatatypeMigration.where(char_col: 'T').first }
     assert_sql(/@0 = 'T'/) { SSTestDatatypeMigration.where(varchar_col: 'T').first }
-  end
+  end unless defined? JRUBY_VERSION
 
   it 'can update and hence properly quoted non-national char/varchar columns' do
     o = SSTestDatatypeMigration.create!

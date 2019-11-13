@@ -13,11 +13,11 @@ class AdapterTestSQLServer < ActiveRecord::TestCase
   let(:basic_update_sql) { "UPDATE [customers] SET [address_street] = NULL WHERE [id] = 2" }
   let(:basic_select_sql) { "SELECT * FROM [customers] WHERE ([customers].[id] = 1)" }
 
-  it 'has basic and non-senstive information in the adpaters inspect method' do
+  it 'has basic and non-sensitive information in the adapters inspect method' do
     string = connection.inspect
     string.must_match %r{ActiveRecord::ConnectionAdapters::SQLServerAdapter}
-    string.must_match %r{version\: \d.\d}
-    string.must_match %r{mode: dblib}
+    string.must_match %r{version\: \d+\.\d}
+    string.must_match %r{mode: (dblib|jdbc)}
     string.must_match %r{azure: (true|false)}
     string.wont_match %r{host}
     string.wont_match %r{password}
@@ -119,6 +119,7 @@ class AdapterTestSQLServer < ActiveRecord::TestCase
     end
 
     it 'lowercase schema reflection when set' do
+      skip 'we do not currently support forcing identifier case' if defined? JRUBY_VERSION
       connection.lowercase_schema_reflection = true
       assert SSTestUppered.columns_hash['column1']
       assert_equal 'Got a minute?', SSTestUppered.first.column1
