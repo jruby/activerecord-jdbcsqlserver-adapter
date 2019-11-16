@@ -576,11 +576,13 @@ class InheritanceTest < ActiveRecord::TestCase
     assert_raise(ActiveRecord::SubclassNotFound) { Company.find(100) }
   end
 
-  coerce_tests! :test_eager_load_belongs_to_primary_key_quoting
-  def test_eager_load_belongs_to_primary_key_quoting_coerced
-    con = Account.connection
-    assert_sql(/\[companies\]\.\[id\] = @0.* @0 = 1/) do
-      Account.all.merge!(:includes => :firm).find(1)
+  unless defined? JRUBY_VERSION
+    coerce_tests! :test_eager_load_belongs_to_primary_key_quoting
+    def test_eager_load_belongs_to_primary_key_quoting_coerced
+      con = Account.connection
+      assert_sql(/\[companies\]\.\[id\] = @0.* @0 = 1/) do
+        Account.all.merge!(:includes => :firm).find(1)
+      end
     end
   end
 end
@@ -959,24 +961,26 @@ class DateTimePrecisionTest < ActiveRecord::TestCase
     end
   end
 
-  # datetime is rounded to increments of .000, .003, or .007 seconds
-  coerce_tests! :test_datetime_precision_is_truncated_on_assignment
-  def test_datetime_precision_is_truncated_on_assignment_coerced
-    @connection.create_table(:foos, force: true)
-    @connection.add_column :foos, :created_at,  :datetime, precision: 0
-    @connection.add_column :foos, :updated_at, :datetime, precision: 6
+  unless defined? JRUBY_VERSION
+    # datetime is rounded to increments of .000, .003, or .007 seconds
+    coerce_tests! :test_datetime_precision_is_truncated_on_assignment
+    def test_datetime_precision_is_truncated_on_assignment_coerced
+      @connection.create_table(:foos, force: true)
+      @connection.add_column :foos, :created_at,  :datetime, precision: 0
+      @connection.add_column :foos, :updated_at, :datetime, precision: 6
 
-    time = ::Time.now.change(nsec: 123456789)
-    foo = Foo.new(created_at: time, updated_at: time)
+      time = ::Time.now.change(nsec: 123456789)
+      foo = Foo.new(created_at: time, updated_at: time)
 
-    assert_equal 0, foo.created_at.nsec
-    assert_equal 123457000, foo.updated_at.nsec
+      assert_equal 0, foo.created_at.nsec
+      assert_equal 123457000, foo.updated_at.nsec
 
-    foo.save!
-    foo.reload
+      foo.save!
+      foo.reload
 
-    assert_equal 0, foo.created_at.nsec
-    assert_equal 123457000, foo.updated_at.nsec
+      assert_equal 0, foo.created_at.nsec
+      assert_equal 123457000, foo.updated_at.nsec
+    end
   end
 end
 
@@ -1002,7 +1006,7 @@ class TimePrecisionTest < ActiveRecord::TestCase
     assert_equal 0, foo.start.nsec
     assert_equal 123457000, foo.finish.nsec
   end
-end
+end unless defined? JRUBY_VERSION
 
 
 
