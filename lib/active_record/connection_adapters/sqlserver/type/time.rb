@@ -20,6 +20,7 @@ module ActiveRecord
 
             # Currently only called from our custom Time type for formatting
             def _formatted(value)
+              return "#{value.to_s(:_sqlserver_time)}" unless precision
               "#{value.to_s(:_sqlserver_time)}.#{quote_fractional(value)}"
             end
 

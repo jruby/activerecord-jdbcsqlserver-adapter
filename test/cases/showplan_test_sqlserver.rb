@@ -5,6 +5,9 @@ class ShowplanTestSQLServer < ActiveRecord::TestCase
 
   fixtures :cars
 
+  # For some reason the default max width truncates values that we are looking for in jruby
+  ActiveRecord::ConnectionAdapters::SQLServer::Showplan::PrinterTable.max_column_width = 500 if defined? JRUBY_VERSION
+
   describe 'Unprepare previously prepared SQL' do
 
     it 'from simple statement' do
