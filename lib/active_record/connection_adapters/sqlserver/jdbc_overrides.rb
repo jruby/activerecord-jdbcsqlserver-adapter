@@ -99,6 +99,7 @@ module ActiveRecord
 
         # Called to set any connection specific settings that aren't defined ahead of time
         def configure_connection
+          return unless @connection.connection.respond_to? :setSendTimeAsDatetime
           # For sql server 2008+ we want it to send an actual time otherwise comparisons with time columns don't work
           @connection.connection.setSendTimeAsDatetime(false)
         end
