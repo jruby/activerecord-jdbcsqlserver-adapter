@@ -6,7 +6,7 @@ module JdbcMssqlDriverLoader
       which = driver
         .getClass().getClassLoader().loadClass(driver_name)
         .getProtectionDomain().getCodeSource().getLocation().to_s
-      warn "You alreday required a mssql jdbc driver (#{which}), skipping gem jdbc-mssql"
+      warn "You already required a mssql jdbc driver (#{which}), skipping gem jdbc-mssql"
 
       major_version = driver.major_version
       required_major_version = 8
