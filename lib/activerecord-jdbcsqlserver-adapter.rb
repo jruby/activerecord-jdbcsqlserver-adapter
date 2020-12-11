@@ -5,7 +5,7 @@ require 'active_support' # Need this for the next line
 require 'active_record/log_subscriber' # Need to make sure this is loaded before we load Core for monkey patching
 
 # Load the jar file for the jdbc driver
-require 'jdbc/mssql'
+require_relative './jdbc_mssql_driver_loader'
 
 # Standadard arjdbc functionality
 require 'arjdbc/abstract/connection_management'
