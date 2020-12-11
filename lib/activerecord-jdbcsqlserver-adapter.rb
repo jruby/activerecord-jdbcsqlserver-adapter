@@ -2,7 +2,7 @@
 require 'active_record/connection_adapters/sqlserver/core_ext/date_time'
 
 # Load the jar file for the jdbc driver
-require 'jdbc/mssql'
+require_relative './jdbc_mssql_driver_loader'
 
 # Standadard arjdbc functionality
 require 'arjdbc/abstract/connection_management'
