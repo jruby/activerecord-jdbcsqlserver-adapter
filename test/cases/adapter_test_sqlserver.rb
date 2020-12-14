@@ -16,7 +16,7 @@ class AdapterTestSQLServer < ActiveRecord::TestCase
   it 'has basic and non-senstive information in the adpaters inspect method' do
     string = connection.inspect
     string.must_match %r{ActiveRecord::ConnectionAdapters::SQLServerAdapter}
-    string.must_match %r{version\: \d.\d}
+    string.must_match %r{version\: \d\d\.\d}
     string.must_match %r{mode: (dblib|jdbc)}
     string.must_match %r{azure: (true|false)}
     string.wont_match %r{host}
@@ -427,4 +427,3 @@ class AdapterTestSQLServer < ActiveRecord::TestCase
   end
 
 end
-
