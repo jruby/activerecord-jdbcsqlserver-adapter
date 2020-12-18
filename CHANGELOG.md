@@ -1,3 +1,8 @@
+## v51.1.0
+
+* Updated activerecord-jdbc-adapter dependecy to fix an issue with inserts on tables with composite primary keys
+* Changed how the jdbc driver is loaded so that other drivers can be used if needed
+
 ## v51.0.0
 
 * Forked original gem to provide JRuby support
@@ -55,4 +60,3 @@
 #### Added
 
 * Support MismatchedForeignKey exception.
-
