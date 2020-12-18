@@ -1,3 +1,8 @@
+## v50.1.0
+
+* Updated dependency on activerecord-jdbc-adapter gem to 50.8 to fix an insert issue created in 50.7
+* Made it so that we only load the jdbc driver if there isn't one already available
+
 ## v50.0.0
 
 * Forked original gem to provide JRuby support
