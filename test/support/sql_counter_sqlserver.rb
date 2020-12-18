@@ -21,8 +21,7 @@ module ARTest
       /SELECT DATABASEPROPERTYEX/im
     ]
 
-    sqlcounter = ObjectSpace.each_object(ActiveRecord::SQLCounter).to_a.first
-    sqlcounter.instance_variable_set :@ignore, Regexp.union(ignored_sql.push(sqlcounter.ignore))
+    ActiveRecord::SQLCounter.ignored_sql.concat(ignored_sql)
 
   end
 end
