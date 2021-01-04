@@ -15,14 +15,15 @@ class AdapterTestSQLServer < ActiveRecord::TestCase
 
   it 'has basic and non-sensitive information in the adapters inspect method' do
     string = connection.inspect
-    string.must_match %r{ActiveRecord::ConnectionAdapters::SQLServerAdapter}
-    string.must_match %r{version\: \d+\.\d}
-    string.must_match %r{mode: (dblib|jdbc)}
-    string.must_match %r{azure: (true|false)}
-    string.wont_match %r{host}
-    string.wont_match %r{password}
-    string.wont_match %r{username}
-    string.wont_match %r{port}
+
+    _(string).must_match %r{ActiveRecord::ConnectionAdapters::SQLServerAdapter}
+    _(string).must_match %r{version\: \d+\.\d}
+    _(string).must_match %r{mode: (dblib|jdbc)}
+    _(string).must_match %r{azure: (true|false)}
+    _(string).wont_match %r{host}
+    _(string).wont_match %r{password}
+    _(string).wont_match %r{username}
+    _(string).wont_match %r{port}
   end
 
   it 'has a 128 max #table_alias_length' do
@@ -162,7 +163,7 @@ class AdapterTestSQLServer < ActiveRecord::TestCase
     end
 
     it 'return an empty array when calling #identity_columns for a table_name with no identity' do
-      connection.send(:identity_columns, Subscriber.table_name).must_equal []
+      _(connection.send(:identity_columns, Subscriber.table_name)).must_equal []
     end
 
   end
@@ -304,7 +305,7 @@ class AdapterTestSQLServer < ActiveRecord::TestCase
     end
 
     it 'find SSTestCustomersView table name' do
-      connection.views.must_include 'sst_customers_view'
+      _(connection.views).must_include 'sst_customers_view'
     end
 
     it 'work with dynamic finders' do
@@ -345,9 +346,9 @@ class AdapterTestSQLServer < ActiveRecord::TestCase
     end
 
     it 'find identity column' do
-      SSTestCustomersView.primary_key.must_equal 'id'
-      connection.primary_key(SSTestCustomersView.table_name).must_equal 'id'
-      SSTestCustomersView.columns_hash['id'].must_be :is_identity?
+      _(SSTestCustomersView.primary_key).must_equal 'id'
+      _(connection.primary_key(SSTestCustomersView.table_name)).must_equal 'id'
+      _(SSTestCustomersView.columns_hash['id']).must_be :is_identity?
     end
 
     it 'find default values' do
@@ -372,9 +373,9 @@ class AdapterTestSQLServer < ActiveRecord::TestCase
     end
 
     it 'find identity column' do
-      SSTestStringDefaultsView.primary_key.must_equal 'id'
-      connection.primary_key(SSTestStringDefaultsView.table_name).must_equal 'id'
-      SSTestStringDefaultsView.columns_hash['id'].must_be :is_identity?
+      _(SSTestStringDefaultsView.primary_key).must_equal 'id'
+      _(connection.primary_key(SSTestStringDefaultsView.table_name)).must_equal 'id'
+      _(SSTestStringDefaultsView.columns_hash['id']).must_be :is_identity?
     end
 
     it 'find default values' do
@@ -423,12 +424,11 @@ class AdapterTestSQLServer < ActiveRecord::TestCase
 
   it 'in_memory_oltp' do
     if ENV['IN_MEMORY_OLTP'] && connection.supports_in_memory_oltp?
-      SSTMemory.primary_key.must_equal 'id'
-      SSTMemory.columns_hash['id'].must_be :is_identity?
+      _(SSTMemory.primary_key).must_equal 'id'
+      _(SSTMemory.columns_hash['id']).must_be :is_identity?
     else
       skip 'supports_in_memory_oltp? => false'
     end
   end
 
 end
-

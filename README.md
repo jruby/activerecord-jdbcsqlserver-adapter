@@ -87,4 +87,3 @@ JDBC version of the gem:
 ## License
 
 Copyright © 2008-2019. It is free software, and may be redistributed under the terms specified in the MIT-LICENSE file.
-
