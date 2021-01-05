@@ -144,31 +144,31 @@ end
 
 
 
-module ActiveRecord
-  class BindParameterTest < ActiveRecord::TestCase
-    # Same as original coerced test except log is found using `EXEC sp_executesql` wrapper.
-    coerce_tests! :test_binds_are_logged
-    def test_binds_are_logged_coerced
-      sub   = Arel::Nodes::BindParam.new(1)
-      binds = [Relation::QueryAttribute.new("id", 1, Type::Value.new)]
-      sql   = "select * from topics where id = #{sub.to_sql}"
-
-      @connection.exec_query(sql, "SQL", binds)
-
-      logged_sql = "EXEC sp_executesql N'#{sql}', N'#{sub.to_sql} int', #{sub.to_sql} = 1"
-      message = @subscriber.calls.find { |args| args[4][:sql] == logged_sql }
-
-      assert_equal binds, message[4][:binds]
-    end
-
-    # SQL Server adapter does not use a statement cache as query plans are already reused using `EXEC sp_executesql`.
-    coerce_tests! :test_statement_cache
-    coerce_tests! :test_statement_cache_with_query_cache
-    coerce_tests! :test_statement_cache_with_find_by
-    coerce_tests! :test_statement_cache_with_in_clause
-    coerce_tests! :test_statement_cache_with_sql_string_literal
-  end
-end
+# module ActiveRecord
+#   class BindParameterTest < ActiveRecord::TestCase
+#     # Same as original coerced test except log is found using `EXEC sp_executesql` wrapper.
+#     # coerce_tests! :test_binds_are_logged
+#     # def test_binds_are_logged_coerced
+#     #   sub   = Arel::Nodes::BindParam.new(1)
+#     #   binds = [Relation::QueryAttribute.new("id", 1, Type::Value.new)]
+#     #   sql   = "select * from topics where id = #{sub.to_sql}"
+#     #
+#     #   @connection.exec_query(sql, "SQL", binds)
+#     #
+#     #   logged_sql = "EXEC sp_executesql N'#{sql}', N'#{sub.to_sql} int', #{sub.to_sql} = 1"
+#     #   message = @subscriber.calls.find { |args| args[4][:sql] == logged_sql }
+#     #
+#     #   assert_equal binds, message[4][:binds]
+#     # end
+#     #
+#     # # SQL Server adapter does not use a statement cache as query plans are already reused using `EXEC sp_executesql`.
+#     # coerce_tests! :test_statement_cache
+#     # coerce_tests! :test_statement_cache_with_query_cache
+#     # coerce_tests! :test_statement_cache_with_find_by
+#     # coerce_tests! :test_statement_cache_with_in_clause
+#     # coerce_tests! :test_statement_cache_with_sql_string_literal
+#   end
+# end
 
 
 module ActiveRecord
@@ -595,13 +595,11 @@ class InheritanceTest < ActiveRecord::TestCase
     assert_raise(ActiveRecord::SubclassNotFound) { Company.find(100) }
   end
 
-  unless defined? JRUBY_VERSION
-    coerce_tests! :test_eager_load_belongs_to_primary_key_quoting
-    def test_eager_load_belongs_to_primary_key_quoting_coerced
-      con = Account.connection
-      assert_sql(/\[companies\]\.\[id\] = @0.* @0 = 1/) do
-        Account.all.merge!(:includes => :firm).find(1)
-      end
+  coerce_tests! :test_eager_load_belongs_to_primary_key_quoting
+  def test_eager_load_belongs_to_primary_key_quoting_coerced
+    con = Account.connection
+    assert_sql(/\[companies\]\.\[id\] = \?/) do
+      Account.all.merge!(:includes => :firm).find(1)
     end
   end
 end
@@ -695,6 +693,19 @@ class PersistenceTest < ActiveRecord::TestCase
     # topic.update_attributes(id: 1234)
     # assert_nothing_raised { topic.reload }
     # assert_equal topic.title, Topic.find(1234).title
+  end
+
+  coerce_tests! :test_delete_new_record
+  def test_delete_new_record_coerced
+    client = Client.new(name: "37signals")
+    client.delete
+    assert_predicate client, :frozen?
+
+    assert_not client.save
+    assert_raise(ActiveRecord::RecordNotSaved) { client.save! }
+
+    assert_predicate client, :frozen?
+    assert_raise(FrozenError) { client.name = "something else" } # For some reason we get a FrozenError instead of a RuntimeError here
   end
 end
 
